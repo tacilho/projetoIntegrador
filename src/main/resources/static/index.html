@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/path/to/favicon.ico">
+    <title>Brinquedoteca - Sistema de Gerenciamento</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0078d4;
+            --primary-blue-hover: #106ebe;
+            --light-blue: #f3f9ff;
+            --accent-blue: #005a9e;
+            --text-primary: #323130;
+            --text-secondary: #605e5c;
+            --text-light: #8a8886;
+            --surface-primary: #ffffff;
+            --surface-secondary: #faf9f8;
+            --border-light: #edebe9;
+            --border-medium: #d2d0ce;
+            --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-heavy: 0 8px 16px rgba(0, 0, 0, 0.16);
+            --radius-small: 4px;
+            --radius-medium: 8px;
+            --radius-large: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--surface-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--surface-primary);
+            border-right: 1px solid var(--border-light);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-blue);
+            border-radius: var(--radius-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .nav-menu {
+            padding: 16px 12px;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-medium);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: white;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        .header {
+            background: var(--surface-primary);
+            border-bottom: 1px solid var(--border-light);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            padding: 8px;
+            border-radius: var(--radius-small);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .menu-toggle:hover {
+            background-color: var(--surface-secondary);
+            color: var(--primary-blue);
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: var(--radius-medium);
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .user-profile:hover {
+            background-color: var(--surface-secondary);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+        }
+
+        .user-info {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 32px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-large);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-light);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-medium);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--light-blue);
+            border-radius: var(--radius-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-medium);
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--surface-primary);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-light);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-medium);
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            margin-right: 12px;
+            margin-bottom: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-blue-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-secondary {
+            background: var(--surface-primary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-medium);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-secondary);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .btn-danger {
+            background: #d13438;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b02a2e;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        /* Tables */
+        .table-container {
+            background: var(--surface-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-large);
+            overflow: hidden;
+            margin-top: 24px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: var(--surface-secondary);
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .table tbody tr:hover {
+            background: var(--light-blue);
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Auth Section */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface-secondary);
+            padding: 32px;
+        }
+
+        .auth-card {
+            background: var(--surface-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-large);
+            padding: 48px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-logo {
+            width: 64px;
+            height: 64px;
+            background: var(--primary-blue);
+            border-radius: var(--radius-large);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin: 0 auto 16px;
+        }
+
+        .auth-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: var(--surface-secondary);
+            border-radius: var(--radius-medium);
+            padding: 4px;
+            margin-bottom: 32px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            border-radius: var(--radius-small);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .auth-tab.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--surface-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-large);
+            padding: 24px;
+            text-align: center;
+            box-shadow: var(--shadow-light);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--light-blue);
+            border-radius: var(--radius-large);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-blue);
+            font-size: 20px;
+            margin: 0 auto 16px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 16px 20px;
+            border-radius: var(--radius-medium);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #dff6dd;
+            color: #107c10;
+            border: 1px solid #c4e5c1;
+        }
+
+        .alert-error {
+            background: #fde7e9;
+            color: #d13438;
+            border: 1px solid #f1aeb5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-area {
+                padding: 16px;
+            }
+
+            .header {
+                padding: 12px 16px;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-card {
+                padding: 32px 24px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+        }
+
+        /* Hide sections initially */
+        .app-content {
+            display: none;
+        }
+
+        .app-content.show {
+            display: block;
+        }
+
+        .auth-section {
+            display: block;
+        }
+
+        .auth-section.hide {
+            display: none;
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Section -->
+    <div id="auth-section" class="auth-section">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <div class="auth-logo">
+                        <i class="fas fa-toys"></i>
+                    </div>
+                    <h1 class="auth-title">Brinquedoteca</h1>
+                    <p class="auth-subtitle">Sistema de Gerenciamento</p>
+                </div>
+                
+                <div class="auth-tabs">
+                    <div class="auth-tab active" onclick="switchAuthTab('login')">
+                        Entrar
+                    </div>
+                    <div class="auth-tab" onclick="switchAuthTab('register')">
+                        Cadastrar
+                    </div>
+                </div>
+
+                <!-- Login Form -->
+                <div id="login-form" class="auth-form">
+                    <form id="form-login">
+                        <div class="form-group">
+                            <label class="form-label" for="email-login">Email</label>
+                            <input type="email" id="email-login" name="email" class="form-control" placeholder="Digite seu email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="senha-login">Senha</label>
+                            <input type="password" id="senha-login" name="senha" class="form-control" placeholder="Digite sua senha" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Entrar
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Register Form -->
+                <div id="register-form" class="auth-form" style="display: none;">
+                    <form id="form-cadastro">
+                        <div class="form-group">
+                            <label class="form-label" for="nome-cadastro">Nome completo</label>
+                            <input type="text" id="nome-cadastro" name="nome" class="form-control" placeholder="Digite seu nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="email-cadastro">Email</label>
+                            <input type="email" id="email-cadastro" name="email" class="form-control" placeholder="Digite seu email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="senha-cadastro">Senha</label>
+                            <input type="password" id="senha-cadastro" name="senha" class="form-control" placeholder="Crie uma senha" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-user-plus"></i>
+                            Criar conta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app-content" class="app-content">
+        <div class="app-container">
+            <!-- Sidebar -->
+            <nav class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-toys"></i>
+                        </div>
+                        <div class="logo-text">
+                            <h1>Brinquedoteca</h1>
+                            <p>Sistema de Gerenciamento</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-menu">
+                    <div class="nav-section">
+                        <div class="nav-section-title">Principal</div>
+                        <div class="nav-item">
+                            <a class="nav-link active" onclick="showSection('dashboard')">
+                                <i class="fas fa-chart-line"></i>
+                                Dashboard
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="nav-section">
+                        <div class="nav-section-title">Gerenciamento</div>
+                        <div class="nav-item">
+                            <a class="nav-link" onclick="showSection('brinquedos')">
+                                <i class="fas fa-puzzle-piece"></i>
+                                Brinquedos
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a class="nav-link" onclick="showSection('jogos')">
+                                <i class="fas fa-gamepad"></i>
+                                Jogos
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="nav-section">
+                        <div class="nav-section-title">Movimentação</div>
+                        <div class="nav-item">
+                            <a class="nav-link" onclick="showSection('entradas')">
+                                <i class="fas fa-arrow-down"></i>
+                                Entradas
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a class="nav-link" onclick="showSection('saidas')">
+                                <i class="fas fa-arrow-up"></i>
+                                Saídas
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="nav-section">
+                        <div class="nav-section-title">Ferramentas</div>
+                        <div class="nav-item">
+                            <a class="nav-link" onclick="showSection('pesquisa')">
+                                <i class="fas fa-search"></i>
+                                Pesquisa
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a class="nav-link" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content" id="main-content">
+                <!-- Header -->
+                <header class="header">
+                    <div class="header-left">
+                        <button class="menu-toggle" onclick="toggleSidebar()">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="page-title" id="page-title">Dashboard</h1>
+                    </div>
+                    <div class="header-right">
+                        <div class="user-profile">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="user-info">Usuário</div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Content Area -->
+                <div class="content-area">
+                    <!-- Dashboard Section -->
+                    <section id="dashboard" class="content-section active">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-puzzle-piece"></i>
+                                </div>
+                                <div class="stat-value" id="total-brinquedos">-</div>
+                                <div class="stat-label">Total de Brinquedos</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-gamepad"></i>
+                                </div>
+                                <div class="stat-value" id="total-jogos">-</div>
+                                <div class="stat-label">Total de Jogos</div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <h2 class="card-title">Bem-vindo ao Sistema</h2>
+                            </div>
+                            <p style="color: var(--text-secondary); line-height: 1.6;">
+                                Use o menu lateral para navegar entre as diferentes seções do sistema. 
+                                Você pode gerenciar brinquedos, jogos, controlar entradas e saídas, 
+                                e realizar pesquisas no acervo.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- Brinquedos Section -->
+                    <section id="brinquedos" class="content-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <h2 class="card-title">Adicionar Brinquedo</h2>
+                            </div>
+                            <form id="form-brinquedo">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label" for="nome-brinquedo">Nome</label>
+                                        <input type="text" id="nome-brinquedo" name="nome" class="form-control" placeholder="Nome do brinquedo" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="tipo-brinquedo">Tipo</label>
+                                        <select id="tipo-brinquedo" name="tipo" class="form-control" required>
+                                            <option value="">Selecione o tipo</option>
+                                            <option value="SENSORIAL">Sensorial</option>
+                                            <option value="MONTAGEM">Montagem</option>
+                                            <option value="ROLEPLAY">Roleplay</option>
+                                            <option value="OUTRO">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="faixa-etaria-brinquedo">Faixa Etária</label>
+                                        <input type="text" id="faixa-etaria-brinquedo" name="faixaEtaria" class="form-control" placeholder="Ex: 3-6 anos" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="area-brinquedo">Área</label>
+                                        <select id="area-brinquedo" name="area" class="form-control" required>
+                                            <option value="INTERIOR">Interior</option>
+                                            <option value="EXTERIOR">Exterior</option>
+                                            <option value="AMBOS">Ambos</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Salvar
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    <i class="fas fa-eraser"></i>
+                                    Limpar
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h2 class="card-title">Buscar Brinquedos</h2>
+                            </div>
+                            <form id="busca-brinquedo">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label" for="nome-busca-brinquedo">Nome</label>
+                                        <input type="text" id="nome-busca-brinquedo" name="nome" class="form-control" placeholder="Buscar por nome">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="tipo-busca-brinquedo">Tipo</label>
+                                        <select id="tipo-busca-brinquedo" name="tipo" class="form-control">
+                                            <option value="">Todos os tipos</option>
+                                            <option value="SENSORIAL">Sensorial</option>
+                                            <option value="MONTAGEM">Montagem</option>
+                                            <option value="ROLEPLAY">Roleplay</option>
+                                            <option value="OUTRO">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="faixa-etaria-busca-brinquedo">Faixa Etária</label>
+                                        <input type="text" id="faixa-etaria-busca-brinquedo" name="faixaEtaria" class="form-control" placeholder="Buscar por faixa etária">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="area-busca-brinquedo">Área</label>
+                                        <select id="area-busca-brinquedo" name="area" class="form-control">
+                                            <option value="">Todas as áreas</option>
+                                            <option value="INTERIOR">Interior</option>
+                                            <option value="EXTERIOR">Exterior</option>
+                                            <option value="AMBOS">Ambos</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                    Buscar
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="listar-todos-brinquedos">
+                                    <i class="fas fa-list"></i>
+                                    Listar Todos
+                                </button>
+                            </form>
+
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nome</th>
+                                            <th>Tipo</th>
+                                            <th>Faixa Etária</th>
+                                            <th>Área</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabela-brinquedos"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Jogos Section -->
+                    <section id="jogos" class="content-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <h2 class="card-title">Adicionar Jogo</h2>
+                            </div>
+                            <form id="form-jogo">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label" for="nome-jogo">Nome</label>
+                                        <input type="text" id="nome-jogo" name="nome" class="form-control" placeholder="Nome do jogo" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="tipo-jogo">Tipo</label>
+                                        <select id="tipo-jogo" name="tipo" class="form-control" required>
+                                            <option value="">Selecione o tipo</option>
+                                            <option value="CARTAS">Cartas</option>
+                                            <option value="QUEBRA_CABECAS">Quebra-Cabeças</option>
+                                            <option value="MONTAGEM">Montagem</option>
+                                            <option value="TABULEIRO">Tabuleiro</option>
+                                            <option value="ENCAIXE">Encaixe</option>
+                                            <option value="OUTRO">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="faixa-etaria-jogo">Faixa Etária</label>
+                                        <input type="text" id="faixa-etaria-jogo" name="faixaEtaria" class="form-control" placeholder="Ex: 5-10 anos" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="estagio-jogo">Estágio de Desenvolvimento</label>
+                                        <select id="estagio-jogo" name="estagio" class="form-control" required>
+                                            <option value="">Selecione o estágio</option>
+                                            <option value="SENSORIO_MOTOR">Sensório-Motor</option>
+                                            <option value="PRE_OPERATORIO">Pré-Operatório</option>
+                                            <option value="OPERATORIO_CONCRETO">Operatório Concreto</option>
+                                            <option value="OPERATORIO_FORMAL">Operatório Formal</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Salvar
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    <i class="fas fa-eraser"></i>
+                                    Limpar
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h2 class="card-title">Buscar Jogos</h2>
+                            </div>
+                            <form id="busca-jogo">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label" for="nome-busca-jogo">Nome</label>
+                                        <input type="text" id="nome-busca-jogo" name="nome" class="form-control" placeholder="Buscar por nome">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="tipo-busca-jogo">Tipo</label>
+                                        <select id="tipo-busca-jogo" name="tipo" class="form-control">
+                                            <option value="">Todos os tipos</option>
+                                            <option value="CARTAS">Cartas</option>
+                                            <option value="QUEBRA_CABECAS">Quebra-Cabeças</option>
+                                            <option value="MONTAGEM">Montagem</option>
+                                            <option value="TABULEIRO">Tabuleiro</option>
+                                            <option value="ENCAIXE">Encaixe</option>
+                                            <option value="OUTRO">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="faixa-etaria-busca-jogo">Faixa Etária</label>
+                                        <input type="text" id="faixa-etaria-busca-jogo" name="faixaEtaria" class="form-control" placeholder="Buscar por faixa etária">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="estagio-busca-jogo">Estágio de Desenvolvimento</label>
+                                        <select id="estagio-busca-jogo" name="estagio" class="form-control">
+                                            <option value="">Todos os estágios</option>
+                                            <option value="SENSORIO_MOTOR">Sensório-Motor</option>
+                                            <option value="PRE_OPERATORIO">Pré-Operatório</option>
+                                            <option value="OPERATORIO_CONCRETO">Operatório Concreto</option>
+                                            <option value="OPERATORIO_FORMAL">Operatório Formal</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                    Buscar
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="listar-todos-jogos">
+                                    <i class="fas fa-list"></i>
+                                    Listar Todos
+                                </button>
+                            </form>
+
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nome</th>
+                                            <th>Tipo</th>
+                                            <th>Faixa Etária</th>
+                                            <th>Estágio</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabela-jogos"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Entradas Section -->
+                    <section id="entradas" class="content-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <h2 class="card-title">Registrar Entrada</h2>
+                            </div>
+                            <form id="form-entrada">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label" for="origem-entrada">Origem</label>
+                                        <select id="origem-entrada" name="origem" class="form-control" required>
+                                            <option value="">Selecione a origem</option>
+                                            <option value="DOACAO">Doação</option>
+                                            <option value="COMPRA">Compra</option>
+                                            <option value="OUTRO">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="data-entrada">Data</label>
+                                        <input type="date" id="data-entrada" name="data" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="jogo-entrada">Jogo (opcional)</label>
+                                        <select id="jogo-entrada" name="jogoId" class="form-control">
+                                            <option value="">Nenhum jogo</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="brinquedo-entrada">Brinquedo (opcional)</label>
+                                        <select id="brinquedo-entrada" name="brinquedoId" class="form-control">
+                                            <option value="">Nenhum brinquedo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Registrar
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    <i class="fas fa-eraser"></i>
+                                    Limpar
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h2 class="card-title">Buscar Entradas</h2>
+                            </div>
+                            <form id="busca-entrada">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label" for="origem-busca-entrada">Origem</label>
+                                        <select id="origem-busca-entrada" name="origem" class="form-control">
+                                            <option value="">Todas as origens</option>
+                                            <option value="DOACAO">Doação</option>
+                                            <option value="COMPRA">Compra</option>
+                                            <option value="OUTRO">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="data-busca-entrada">Data</label>
+                                        <input type="date" id="data-busca-entrada" name="data" class="form-control">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                    Buscar
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="listar-todas-entradas">
+                                    <i class="fas fa-list"></i>
+                                    Listar Todas
+                                </button>
+                            </form>
+
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Origem</th>
+                                            <th>Data</th>
+                                            <th>Jogo</th>
+                                            <th>Brinquedo</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabela-entradas"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Saídas Section -->
+                    <section id="saidas" class="content-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <h2 class="card-title">Registrar Saída</h2>
+                            </div>
+                            <form id="form-saida">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label" for="motivo-saida">Motivo</label>
+                                        <select id="motivo-saida" name="motivo" class="form-control" required>
+                                            <option value="">Selecione o motivo</option>
+                                            <option value="DOACAO">Doação</option>
+                                            <option value="DESCARTE">Descarte</option>
+                                            <option value="OUTRO">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="data-saida">Data</label>
+                                        <input type="date" id="data-saida" name="data" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="jogo-saida">Jogo (opcional)</label>
+                                        <select id="jogo-saida" name="jogoId" class="form-control">
+                                            <option value="">Nenhum jogo</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="brinquedo-saida">Brinquedo (opcional)</label>
+                                        <select id="brinquedo-saida" name="brinquedoId" class="form-control">
+                                            <option value="">Nenhum brinquedo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Registrar
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    <i class="fas fa-eraser"></i>
+                                    Limpar
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h2 class="card-title">Buscar Saídas</h2>
+                            </div>
+                            <form id="busca-saida">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label" for="motivo-busca-saida">Motivo</label>
+                                        <select id="motivo-busca-saida" name="motivo" class="form-control">
+                                            <option value="">Todos os motivos</option>
+                                            <option value="DOACAO">Doação</option>
+                                            <option value="DESCARTE">Descarte</option>
+                                            <option value="OUTRO">Outro</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="data-busca-saida">Data</label>
+                                        <input type="date" id="data-busca-saida" name="data" class="form-control">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                    Buscar
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="listar-todas-saidas">
+                                    <i class="fas fa-list"></i>
+                                    Listar Todas
+                                </button>
+                            </form>
+
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Motivo</th>
+                                            <th>Data</th>
+                                            <th>Jogo</th>
+                                            <th>Brinquedo</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabela-saidas"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Pesquisa Section -->
+                    <section id="pesquisa" class="content-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h2 class="card-title">Pesquisa Geral</h2>
+                            </div>
+                            <form id="form-pesquisa">
+                                <div class="form-group">
+                                    <label class="form-label" for="termo-pesquisa">Termo de Pesquisa</label>
+                                    <input type="text" id="termo-pesquisa" name="termo" class="form-control" placeholder="Digite o que você está procurando..." required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                    Pesquisar
+                                </button>
+                            </form>
+                        </div>
+
+                        <div id="resultados-pesquisa">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-gamepad"></i>
+                                    </div>
+                                    <h2 class="card-title">Jogos Encontrados</h2>
+                                </div>
+                                <div class="table-container">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nome</th>
+                                                <th>Tipo</th>
+                                                <th>Faixa Etária</th>
+                                                <th>Estágio</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tabela-pesquisa-jogos"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-puzzle-piece"></i>
+                                    </div>
+                                    <h2 class="card-title">Brinquedos Encontrados</h2>
+                                </div>
+                                <div class="table-container">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nome</th>
+                                                <th>Tipo</th>
+                                                <th>Faixa Etária</th>
+                                                <th>Área</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tabela-pesquisa-brinquedos"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </div>
+                                    <h2 class="card-title">Entradas Relacionadas</h2>
+                                </div>
+                                <div class="table-container">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Origem</th>
+                                                <th>Data</th>
+                                                <th>Jogo</th>
+                                                <th>Brinquedo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tabela-pesquisa-entradas"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </div>
+                                    <h2 class="card-title">Saídas Relacionadas</h2>
+                                </div>
+                                <div class="table-container">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Motivo</th>
+                                                <th>Data</th>
+                                                <th>Jogo</th>
+                                                <th>Brinquedo</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tabela-pesquisa-saidas"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = 'http://localhost:8080/api';
+
+        // Auth functions
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const tabs = document.querySelectorAll('.auth-tab');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                tabs[0].classList.add('active');
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                tabs[1].classList.add('active');
+            }
+        }
+
+        function showApp() {
+            document.getElementById('auth-section').classList.add('hide');
+            document.getElementById('app-content').classList.add('show');
+            carregarItensParaSelecao();
+            loadDashboardData();
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            document.getElementById('auth-section').classList.remove('hide');
+            document.getElementById('app-content').classList.remove('show');
+        }
+
+        // Navigation functions
+        function showSection(sectionName) {
+            const sections = document.querySelectorAll('.content-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            sections.forEach(section => section.classList.remove('active'));
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            document.getElementById(sectionName).classList.add('active');
+            event.target.classList.add('active');
+            
+            const titles = {
+                'dashboard': 'Dashboard',
+                'brinquedos': 'Gerenciar Brinquedos',
+                'jogos': 'Gerenciar Jogos',
+                'entradas': 'Controle de Entradas',
+                'saidas': 'Controle de Saídas',
+                'pesquisa': 'Pesquisa Geral'
+            };
+            
+            document.getElementById('page-title').textContent = titles[sectionName];
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show');
+            } else {
+                sidebar.classList.toggle('hidden');
+                mainContent.classList.toggle('expanded');
+            }
+        }
+
+        // Dashboard functions
+        async function loadDashboardData() {
+            try {
+                const [brinquedosResponse, jogosResponse] = await Promise.all([
+                    fetchAutenticado(`${apiUrl}/brinquedos`),
+                    fetchAutenticado(`${apiUrl}/jogos`)
+                ]);
+
+                if (brinquedosResponse && jogosResponse) {
+                    const [brinquedos, jogos] = await Promise.all([
+                        brinquedosResponse.json(),
+                        jogosResponse.json()
+                    ]);
+
+                    document.getElementById('total-brinquedos').textContent = brinquedos.length;
+                    document.getElementById('total-jogos').textContent = jogos.length;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados do dashboard:', error);
+            }
+        }
+
+        // Utility functions
+        function verificarAutenticacao() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showAlert('Por favor, faça login para continuar', 'error');
+                logout();
+                return false;
+            }
+            return true;
+        }
+
+        async function fetchAutenticado(url, options = {}) {
+            if (!verificarAutenticacao()) return null;
+
+            const token = localStorage.getItem('token');
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            try {
+                const response = await fetch(url, { ...options, headers });
+                
+                if (response.status === 403) {
+                    localStorage.removeItem('token');
+                    showAlert('Sessão expirada. Por favor, faça login novamente.', 'error');
+                    logout();
+                    return null;
+                }
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+
+                return response;
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                showAlert('Erro ao fazer requisição: ' + error.message, 'error');
+                return null;
+            }
+        }
+
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${message}
+            `;
+            
+            const contentArea = document.querySelector('.content-area');
+            contentArea.insertBefore(alert, contentArea.firstChild);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        async function deletar(tipo, id) {
+            if (!confirm('Tem certeza que deseja deletar este item?')) return;
+            
+            const response = await fetchAutenticado(`${apiUrl}/${tipo}/${id}`, {
+                method: 'DELETE'
+            });
+            
+            if (response && response.ok) {
+                showAlert('Item deletado com sucesso!');
+                if (tipo === 'brinquedos') {
+                    document.getElementById('listar-todos-brinquedos').click();
+                } else if (tipo === 'jogos') {
+                    document.getElementById('listar-todos-jogos').click();
+                } else if (tipo === 'entradas') {
+                    document.getElementById('listar-todas-entradas').click();
+                } else if (tipo === 'saidas') {
+                    document.getElementById('listar-todas-saidas').click();
+                }
+            }
+        }
+
+        // Event listeners
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch(`${apiUrl}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.token) {
+                        localStorage.setItem('token', result.token);
+                        showAlert('Login realizado com sucesso!');
+                        showApp();
+                    } else {
+                        showAlert('Erro: Token não recebido', 'error');
+                    }
+                } else {
+                    const error = await response.text();
+                    showAlert('Erro ao fazer login: ' + error, 'error');
+                }
+            } catch (error) {
+                console.error('Erro no login:', error);
+                showAlert('Erro ao fazer login. Tente novamente.', 'error');
+            }
+        });
+
+        document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch(`${apiUrl}/cadastro`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showAlert('Cadastro realizado com sucesso!');
+                    switchAuthTab('login');
+                    e.target.reset();
+                } else {
+                    const error = await response.text();
+                    showAlert('Erro ao cadastrar: ' + error, 'error');
+                }
+            } catch (error) {
+                console.error('Erro no cadastro:', error);
+                showAlert('Erro ao cadastrar. Tente novamente.', 'error');
+            }
+        });
+
+        // Brinquedos
+        document.getElementById('form-brinquedo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            const response = await fetchAutenticado(`${apiUrl}/brinquedos`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            if (response && response.ok) {
+                showAlert('Brinquedo salvo com sucesso!');
+                e.target.reset();
+                loadDashboardData();
+            }
+        });
+
+        document.getElementById('busca-brinquedo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams(formData).toString();
+            
+            const response = await fetchAutenticado(`${apiUrl}/brinquedos/search?${params}`);
+            if (response && response.ok) {
+                const brinquedos = await response.json();
+                const tbody = document.getElementById('tabela-brinquedos');
+                tbody.innerHTML = brinquedos.map(b => `
+                    <tr>
+                        <td>${b.id}</td>
+                        <td>${b.nome}</td>
+                        <td>${b.tipo}</td>
+                        <td>${b.faixaEtaria}</td>
+                        <td>${b.area}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="deletar('brinquedos', ${b.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        });
+
+        document.getElementById('listar-todos-brinquedos').addEventListener('click', async () => {
+            const response = await fetchAutenticado(`${apiUrl}/brinquedos`);
+            if (response && response.ok) {
+                const brinquedos = await response.json();
+                const tbody = document.getElementById('tabela-brinquedos');
+                tbody.innerHTML = brinquedos.map(b => `
+                    <tr>
+                        <td>${b.id}</td>
+                        <td>${b.nome}</td>
+                        <td>${b.tipo}</td>
+                        <td>${b.faixaEtaria}</td>
+                        <td>${b.area}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="deletar('brinquedos', ${b.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        });
+
+        // Jogos
+        document.getElementById('form-jogo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            const response = await fetchAutenticado(`${apiUrl}/jogos`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            if (response && response.ok) {
+                showAlert('Jogo salvo com sucesso!');
+                e.target.reset();
+                loadDashboardData();
+            }
+        });
+
+        document.getElementById('busca-jogo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams(formData).toString();
+            
+            const response = await fetchAutenticado(`${apiUrl}/jogos/search?${params}`);
+            if (response && response.ok) {
+                const jogos = await response.json();
+                const tbody = document.getElementById('tabela-jogos');
+                tbody.innerHTML = jogos.map(j => `
+                    <tr>
+                        <td>${j.id}</td>
+                        <td>${j.nome}</td>
+                        <td>${j.tipo}</td>
+                        <td>${j.faixaEtaria}</td>
+                        <td>${j.estagio}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="deletar('jogos', ${j.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        });
+
+        document.getElementById('listar-todos-jogos').addEventListener('click', async () => {
+            const response = await fetchAutenticado(`${apiUrl}/jogos`);
+            if (response && response.ok) {
+                const jogos = await response.json();
+                const tbody = document.getElementById('tabela-jogos');
+                tbody.innerHTML = jogos.map(j => `
+                    <tr>
+                        <td>${j.id}</td>
+                        <td>${j.nome}</td>
+                        <td>${j.tipo}</td>
+                        <td>${j.faixaEtaria}</td>
+                        <td>${j.estagio}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="deletar('jogos', ${j.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        });
+
+        // Load items for selection
+        async function carregarItensParaSelecao() {
+            if (!verificarAutenticacao()) return;
+
+            try {
+                const [jogosResponse, brinquedosResponse] = await Promise.all([
+                    fetchAutenticado(`${apiUrl}/jogos`),
+                    fetchAutenticado(`${apiUrl}/brinquedos`)
+                ]);
+
+                if (!jogosResponse || !brinquedosResponse) return;
+
+                const [jogos, brinquedos] = await Promise.all([
+                    jogosResponse.json(),
+                    brinquedosResponse.json()
+                ]);
+
+                const jogoSelects = ['jogo-entrada', 'jogo-saida'];
+                const brinquedoSelects = ['brinquedo-entrada', 'brinquedo-saida'];
+
+                jogoSelects.forEach(selectId => {
+                    const select = document.getElementById(selectId);
+                    select.innerHTML = '<option value="">Nenhum jogo</option>' + 
+                        jogos.map(j => `<option value="${j.id}">${j.nome}</option>`).join('');
+                });
+
+                brinquedoSelects.forEach(selectId => {
+                    const select = document.getElementById(selectId);
+                    select.innerHTML = '<option value="">Nenhum brinquedo</option>' + 
+                        brinquedos.map(b => `<option value="${b.id}">${b.nome}</option>`).join('');
+                });
+            } catch (error) {
+                console.error('Erro ao carregar itens:', error);
+            }
+        }
+
+        // Entradas
+        document.getElementById('form-entrada').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            if (!data.jogoId) delete data.jogoId;
+            if (!data.brinquedoId) delete data.brinquedoId;
+            
+            const response = await fetchAutenticado(`${apiUrl}/entradas`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            if (response && response.ok) {
+                showAlert('Entrada registrada com sucesso!');
+                e.target.reset();
+            }
+        });
+
+        document.getElementById('busca-entrada').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams(formData).toString();
+            
+            const response = await fetchAutenticado(`${apiUrl}/entradas/search?${params}`);
+            if (response && response.ok) {
+                const entradas = await response.json();
+                const tbody = document.getElementById('tabela-entradas');
+                tbody.innerHTML = entradas.map(e => `
+                    <tr>
+                        <td>${e.id}</td>
+                        <td>${e.origem}</td>
+                        <td>${e.data}</td>
+                        <td>${e.jogo?.nome || '-'}</td>
+                        <td>${e.brinquedo?.nome || '-'}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="deletar('entradas', ${e.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        });
+
+        document.getElementById('listar-todas-entradas').addEventListener('click', async () => {
+            const response = await fetchAutenticado(`${apiUrl}/entradas`);
+            if (response && response.ok) {
+                const entradas = await response.json();
+                const tbody = document.getElementById('tabela-entradas');
+                tbody.innerHTML = entradas.map(e => `
+                    <tr>
+                        <td>${e.id}</td>
+                        <td>${e.origem}</td>
+                        <td>${e.data}</td>
+                        <td>${e.jogo?.nome || '-'}</td>
+                        <td>${e.brinquedo?.nome || '-'}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="deletar('entradas', ${e.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        });
+
+        // Saídas
+        document.getElementById('form-saida').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            if (!data.jogoId) delete data.jogoId;
+            if (!data.brinquedoId) delete data.brinquedoId;
+            
+            const response = await fetchAutenticado(`${apiUrl}/saidas`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            
+            if (response && response.ok) {
+                showAlert('Saída registrada com sucesso!');
+                e.target.reset();
+            }
+        });
+
+        document.getElementById('busca-saida').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams(formData).toString();
+            
+            const response = await fetchAutenticado(`${apiUrl}/saidas/search?${params}`);
+            if (response && response.ok) {
+                const saidas = await response.json();
+                const tbody = document.getElementById('tabela-saidas');
+                tbody.innerHTML = saidas.map(s => `
+                    <tr>
+                        <td>${s.id}</td>
+                        <td>${s.motivo}</td>
+                        <td>${s.data}</td>
+                        <td>${s.jogo?.nome || '-'}</td>
+                        <td>${s.brinquedo?.nome || '-'}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="deletar('saidas', ${s.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        });
+
+        document.getElementById('listar-todas-saidas').addEventListener('click', async () => {
+            const response = await fetchAutenticado(`${apiUrl}/saidas`);
+            if (response && response.ok) {
+                const saidas = await response.json();
+                const tbody = document.getElementById('tabela-saidas');
+                tbody.innerHTML = saidas.map(s => `
+                    <tr>
+                        <td>${s.id}</td>
+                        <td>${s.motivo}</td>
+                        <td>${s.data}</td>
+                        <td>${s.jogo?.nome || '-'}</td>
+                        <td>${s.brinquedo?.nome || '-'}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="deletar('saidas', ${s.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        });
+
+        // Pesquisa
+        document.getElementById('form-pesquisa').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const termo = document.getElementById('termo-pesquisa').value;
+            
+            const response = await fetchAutenticado(`${apiUrl}/pesquisa?termo=${termo}`);
+            if (response && response.ok) {
+                const resultados = await response.json();
+                
+                const tbodyJogos = document.getElementById('tabela-pesquisa-jogos');
+                const tbodyBrinquedos = document.getElementById('tabela-pesquisa-brinquedos');
+                const tbodyEntradas = document.getElementById('tabela-pesquisa-entradas');
+                const tbodySaidas = document.getElementById('tabela-pesquisa-saidas');
+
+                tbodyJogos.innerHTML = resultados.jogos.map(j => `
+                    <tr>
+                        <td>${j.id}</td>
+                        <td>${j.nome}</td>
+                        <td>${j.tipo}</td>
+                        <td>${j.faixaEtaria}</td>
+                        <td>${j.estagio}</td>
+                    </tr>
+                `).join('');
+
+                tbodyBrinquedos.innerHTML = resultados.brinquedos.map(b => `
+                    <tr>
+                        <td>${b.id}</td>
+                        <td>${b.nome}</td>
+                        <td>${b.tipo}</td>
+                        <td>${b.faixaEtaria}</td>
+                        <td>${b.area}</td>
+                    </tr>
+                `).join('');
+
+                tbodyEntradas.innerHTML = resultados.entradas.map(e => `
+                    <tr>
+                        <td>${e.id}</td>
+                        <td>${e.origem}</td>
+                        <td>${e.data}</td>
+                        <td>${e.jogo?.nome || 'Nenhum'}</td>
+                        <td>${e.brinquedo?.nome || 'Nenhum'}</td>
+                    </tr>
+                `).join('');
+
+                tbodySaidas.innerHTML = resultados.saidas.map(s => `
+                    <tr>
+                        <td>${s.id}</td>
+                        <td>${s.motivo}</td>
+                        <td>${s.data}</td>
+                        <td>${s.jogo?.nome || 'Nenhum'}</td>
+                        <td>${s.brinquedo?.nome || 'Nenhum'}</td>
+                    </tr>
+                `).join('');
+            }
+        });
+
+        // Initialize app
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                showApp();
+            }
+        });
+
+        // Handle responsive sidebar
+        window.addEventListener('resize', () => {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('show');
+                if (!sidebar.classList.contains('hidden')) {
+                    mainContent.classList.remove('expanded');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

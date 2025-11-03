@@ -13,10 +13,9 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    // Chave secreta fixa (pode ser qualquer string grande, mas mantenha em segredo em produção)
     private static final String SECRET = "MINHA_CHAVE_SUPER_SECRETA_12345678901234567890123456789012_ABCDEF1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
     private final SecretKey secretKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-    private final long expiration = 86400000; // 24 horas
+    private final long expiration = 86400000;
 
     public String generateToken(String email) {
         return Jwts.builder()

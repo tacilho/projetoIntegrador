@@ -47,7 +47,7 @@
             min-height: 100vh;
         }
 
-        /* Sidebar */
+        
         .sidebar {
             width: 280px;
             background: var(--surface-primary);
@@ -164,7 +164,7 @@
             text-align: center;
         }
 
-        /* Main Content */
+        
         .main-content {
             flex: 1;
             margin-left: 280px;
@@ -252,7 +252,7 @@
             color: var(--text-secondary);
         }
 
-        /* Content Area */
+        
         .content-area {
             padding: 32px;
         }
@@ -271,7 +271,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Cards */
+        
         .card {
             background: var(--surface-primary);
             border: 1px solid var(--border-light);
@@ -312,7 +312,7 @@
             color: var(--text-primary);
         }
 
-        /* Forms */
+        
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -354,7 +354,7 @@
             color: var(--text-light);
         }
 
-        /* Buttons */
+        
         .btn {
             display: inline-flex;
             align-items: center;
@@ -411,7 +411,7 @@
             font-size: 12px;
         }
 
-        /* Tables */
+        
         .table-container {
             background: var(--surface-primary);
             border: 1px solid var(--border-light);
@@ -452,7 +452,7 @@
             border-bottom: none;
         }
 
-        /* Auth Section */
+        
         .auth-container {
             min-height: 100vh;
             display: flex;
@@ -527,7 +527,7 @@
             color: white;
         }
 
-        /* Dashboard Stats */
+        
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -576,7 +576,7 @@
             font-weight: 500;
         }
 
-        /* Alerts */
+        
         .alert {
             padding: 16px 20px;
             border-radius: var(--radius-medium);
@@ -600,7 +600,7 @@
             border: 1px solid #f1aeb5;
         }
 
-        /* Responsive */
+        
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -643,7 +643,7 @@
             }
         }
 
-        /* Hide sections initially */
+        
         .app-content {
             display: none;
         }
@@ -660,7 +660,7 @@
             display: none;
         }
 
-        /* Loading */
+        
         .loading {
             display: inline-block;
             width: 16px;
@@ -678,7 +678,7 @@
     </style>
 </head>
 <body>
-    <!-- Auth Section -->
+    
     <div id="auth-section" class="auth-section">
         <div class="auth-container">
             <div class="auth-card">
@@ -699,7 +699,7 @@
                     </div>
                 </div>
 
-                <!-- Login Form -->
+                
                 <div id="login-form" class="auth-form">
                     <form id="form-login">
                         <div class="form-group">
@@ -717,7 +717,7 @@
                     </form>
                 </div>
 
-                <!-- Register Form -->
+                
                 <div id="register-form" class="auth-form" style="display: none;">
                     <form id="form-cadastro">
                         <div class="form-group">
@@ -742,10 +742,10 @@
         </div>
     </div>
 
-    <!-- Main App -->
+    
     <div id="app-content" class="app-content">
         <div class="app-container">
-            <!-- Sidebar -->
+            
             <nav class="sidebar" id="sidebar">
                 <div class="sidebar-header">
                     <div class="logo">
@@ -820,9 +820,9 @@
                 </div>
             </nav>
 
-            <!-- Main Content -->
+            
             <main class="main-content" id="main-content">
-                <!-- Header -->
+                
                 <header class="header">
                     <div class="header-left">
                         <button class="menu-toggle" onclick="toggleSidebar()">
@@ -840,9 +840,9 @@
                     </div>
                 </header>
 
-                <!-- Content Area -->
+                
                 <div class="content-area">
-                    <!-- Dashboard Section -->
+                    
                     <section id="dashboard" class="content-section active">
                         <div class="stats-grid">
                             <div class="stat-card">
@@ -876,7 +876,7 @@
                         </div>
                     </section>
 
-                    <!-- Brinquedos Section -->
+                    
                     <section id="brinquedos" class="content-section">
                         <div class="card">
                             <div class="card-header">
@@ -990,7 +990,7 @@
                         </div>
                     </section>
 
-                    <!-- Jogos Section -->
+                    
                     <section id="jogos" class="content-section">
                         <div class="card">
                             <div class="card-header">
@@ -1111,7 +1111,7 @@
                         </div>
                     </section>
 
-                    <!-- Entradas Section -->
+                    
                     <section id="entradas" class="content-section">
                         <div class="card">
                             <div class="card-header">
@@ -1210,7 +1210,7 @@
                         </div>
                     </section>
 
-                    <!-- Saídas Section -->
+                    
                     <section id="saidas" class="content-section">
                         <div class="card">
                             <div class="card-header">
@@ -1309,7 +1309,7 @@
                         </div>
                     </section>
 
-                    <!-- Pesquisa Section -->
+                    
                     <section id="pesquisa" class="content-section">
                         <div class="card">
                             <div class="card-header">
@@ -1431,8 +1431,6 @@
 
     <script>
         const apiUrl = 'http://localhost:8080/api';
-
-        // Auth functions
         function switchAuthTab(tab) {
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
@@ -1463,8 +1461,6 @@
             document.getElementById('auth-section').classList.remove('hide');
             document.getElementById('app-content').classList.remove('show');
         }
-
-        // Navigation functions
         function showSection(sectionName) {
             const sections = document.querySelectorAll('.content-section');
             const navLinks = document.querySelectorAll('.nav-link');
@@ -1498,8 +1494,6 @@
                 mainContent.classList.toggle('expanded');
             }
         }
-
-        // Dashboard functions
         async function loadDashboardData() {
             try {
                 const [brinquedosResponse, jogosResponse] = await Promise.all([
@@ -1520,8 +1514,6 @@
                 console.error('Erro ao carregar dados do dashboard:', error);
             }
         }
-
-        // Utility functions
         function verificarAutenticacao() {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -1601,8 +1593,6 @@
                 }
             }
         }
-
-        // Event listeners
         document.getElementById('form-login').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -1659,8 +1649,6 @@
                 showAlert('Erro ao cadastrar. Tente novamente.', 'error');
             }
         });
-
-        // Brinquedos
         document.getElementById('form-brinquedo').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -1725,8 +1713,6 @@
                 `).join('');
             }
         });
-
-        // Jogos
         document.getElementById('form-jogo').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -1791,8 +1777,6 @@
                 `).join('');
             }
         });
-
-        // Load items for selection
         async function carregarItensParaSelecao() {
             if (!verificarAutenticacao()) return;
 
@@ -1827,8 +1811,6 @@
                 console.error('Erro ao carregar itens:', error);
             }
         }
-
-        // Entradas
         document.getElementById('form-entrada').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -1894,8 +1876,6 @@
                 `).join('');
             }
         });
-
-        // Saídas
         document.getElementById('form-saida').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -1961,8 +1941,6 @@
                 `).join('');
             }
         });
-
-        // Pesquisa
         document.getElementById('form-pesquisa').addEventListener('submit', async (e) => {
             e.preventDefault();
             const termo = document.getElementById('termo-pesquisa').value;
@@ -2017,16 +1995,12 @@
                 `).join('');
             }
         });
-
-        // Initialize app
         window.addEventListener('load', () => {
             const token = localStorage.getItem('token');
             if (token) {
                 showApp();
             }
         });
-
-        // Handle responsive sidebar
         window.addEventListener('resize', () => {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('main-content');

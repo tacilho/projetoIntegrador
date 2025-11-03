@@ -34,8 +34,8 @@ public class PesquisaController {
     public Map<String, Object> pesquisar(@RequestParam String termo) {
         List<Jogo> jogos = jogoService.buscar(termo, null, null, null);
         List<Brinquedo> brinquedos = brinquedoService.buscar(termo, null, null, null);
-        List<Entrada> entradas = entradaService.listarTodos(); // Filtro básico por enquanto
-        List<Saida> saidas = saidaService.listarTodos(); // Filtro básico por enquanto
+        List<Entrada> entradas = entradaService.listarTodos();
+        List<Saida> saidas = saidaService.listarTodos();
         return Map.of(
                 "jogos", jogos,
                 "brinquedos", brinquedos,
